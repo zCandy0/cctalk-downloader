@@ -44,9 +44,13 @@ def download_videos(video_id, series_id, cookies, i, dir_name):
     video_name, video_url = get_video_information(video_id, series_id, cookies)
     filename = f"{i}-{video_name}"
     filepath = f"{dir_name}/{filename}.mp4"
+    file = Path(filepath)
+    if file.exists():
+        print(f"文件已存在，跳过下载: {filename}")
+        return
     response = requests.get(url=video_url, cookies=cookies, stream=True)
     total_size = int(response.headers.get('content-length', 0))
-    with open(filepath, 'wb') as file:
+    with file.open('wb') as file:
         with tqdm(total=total_size, unit='B', unit_scale=True, desc=filename) as bar:
             for chunk in response.iter_content(chunk_size=1024):
                 if chunk:
@@ -67,6 +71,7 @@ def main():
     dir_path.mkdir(parents=True, exist_ok=True)
     print(f"下载目录:   {dir_name}")
     print("---开始下载---")
+    print(f"共计{len(content_id_list)}项")
     for index, v_id in enumerate(content_id_list, 1):
         print(f"正在下载第{index}项")
         download_videos(v_id, series_id, cookies, index, dir_name)

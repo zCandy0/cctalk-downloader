@@ -9,6 +9,15 @@ def to_cookie(c):
     return cookies
 
 
+def check_series_id(sid):
+    try:
+        sid_int = int(sid)
+        return
+    except ValueError:
+        print("seriesId 输入有误")
+        exit(0)
+
+
 def get_content_id_list(cookies, series_id):
     pre = "https://www.cctalk.com/webapi/content/v1.1/series/"
     suf = "/get_content_unit_struts"
@@ -64,14 +73,16 @@ def main():
     c = input("输入cookie: ")
     cookies = to_cookie(c)
     series_id = input("输入seriesId: ")
+    check_series_id(series_id)
     content_id_list = get_content_id_list(cookies, series_id)
     series_name = get_series_name(content_id_list[-1], series_id, cookies)
     dir_name = f"D:/{series_name}"
     dir_path = Path(dir_name)
     dir_path.mkdir(parents=True, exist_ok=True)
+    print(f"即将要下载的是:    {series_id}")
     print(f"下载目录:   {dir_name}")
-    print("---开始下载---")
     print(f"共计{len(content_id_list)}项")
+    print("---开始下载---")
     for index, v_id in enumerate(content_id_list, 1):
         print(f"正在下载第{index}项")
         download_videos(v_id, series_id, cookies, index, dir_name)
